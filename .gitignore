@@ -2,6 +2,6 @@ env.py
 .DS_Store
 .ipynb_checkpoints/
 __pycache__
-titanic.csv
-iris.csv
+iris_df.csv
+titanic_df.csv
 Excel_Exercises.xlsx
