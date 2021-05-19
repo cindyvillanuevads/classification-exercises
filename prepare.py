@@ -33,7 +33,25 @@ def prep_iris(df):
     #  concat dummy_df with my df
     df = pd.concat([df, dummy_df], axis =1)
     return df
-    
+
+
+
+
+
+def iris_split_data(df):
+    '''
+    take in a DataFrame and return train, validate, and test DataFrames; stratify on survived.
+    return train, validate, test DataFrames.
+    '''
+    train_validate, test = train_test_split(df, test_size=.2, random_state=123, stratify=df.species)
+    train, validate = train_test_split(train_validate, 
+                                       test_size=.3, 
+                                       random_state=123, 
+                                       stratify=train_validate.species)
+    return train, validate, test
+
+
+
 # ************************************ TITANIC DATA***********************************
 def split_data(df):
     '''
