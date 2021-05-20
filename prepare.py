@@ -94,7 +94,7 @@ def prep_titanic_data(df, column, method ,dummies):
     df = df.drop(columns=['deck', 'embark_town'])
     
     #create a dummy df
-    dummy_df = pd.get_dummies(df[dummies], dummy_na=False, drop_first=[True, True])
+    dummy_df = pd.get_dummies(df[dummies], drop_first=[True, True])
     ## Concatenate the dummy_df dataframe above with the original df
     df = pd.concat([df, dummy_df], axis=1)
     
