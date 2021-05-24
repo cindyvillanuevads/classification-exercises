@@ -10,6 +10,7 @@ from sklearn.metrics import recall_score
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import classification_report
 import matplotlib.pyplot as plt
+from IPython.display import display
 
 
 
@@ -85,18 +86,15 @@ def model_performs (X_df, y_df, model):
     The positive is  'survived'
 
     Confusion Matrix
-
-    ''',
-    cf
-    )
+    ''')
+    display(cf)
     print('''
 
     ________________________________________________________________________________
     
     Classification Report:
-    
-    ''',
-    clas_rep)
+    ''')
+    display(clas_rep)
    
 
 
