@@ -116,14 +116,13 @@ def dec_tree(model, X_df):
 
 def compare (model1, model2, X_df,y_df):
     '''
-    Take in a X_df, y_df and model  and fit the model , make a prediction, calculate score (accuracy), 
-    confusion matrix, rates, clasification report.
+    Take in two models to compare their performance metrics.
     X_df: train, validate or  test. Select one
     y_df: it has to be the same as X_df.
-    model: name of your model that you prevously created 
-    
-    Example:
-    mmodel_performs (X_train, y_train, model1)
+    model1: name of your first model that you want to compare  
+    model2: name of your second model that you want to compare
+    Example: 
+    compare(logit2, logit4, X_validate, y_validate)
     '''
 
 
@@ -231,6 +230,7 @@ def compare_metrics (model, name_dataset1, X, y, name_dataset2,  X2, y2 ):
     
     Example:
     compare_metrics(logit2,'Train',X_train, y_train,'Test', X_test, y_test)
+
     '''
     
     if name_dataset1.lower() != "train" and name_dataset1.lower() != "validate" and name_dataset1.lower() != "test" :
