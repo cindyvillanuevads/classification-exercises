@@ -41,11 +41,6 @@ def model_performs (X_df, y_df, model):
     Example:
     mmodel_performs (X_train, y_train, model1)
     '''
-    # create the model
-    #model = DecisionTreeClassifier(max_depth=None, max_features=None, random_state=None )
-
-    # fit the model
-    #model.fit(X_df, y_df)
 
     #prediction
     pred = model.predict(X_df)
@@ -117,3 +112,97 @@ def dec_tree(model, X_df):
     class_names=['died', 'survived'],
     )
     plt.show()
+
+
+
+def compare (model1, model2, X_df,y_df):
+    '''
+    Take in a X_df, y_df and model  and fit the model , make a prediction, calculate score (accuracy), 
+    confusion matrix, rates, clasification report.
+    X_df: train, validate or  test. Select one
+    y_df: it has to be the same as X_df.
+    model: name of your model that you prevously created 
+    
+    Example:
+    mmodel_performs (X_train, y_train, model1)
+    '''
+
+    #prediction
+    pred1 = model1.predict(X_df)
+    pred2 = model2.predict(X_df)
+
+    #score = accuracy
+    acc1 = model1.score(X_df, y_df)
+    acc2 = model2.score(X_df, y_df)
+
+
+    #conf Matrix
+    #model 1
+    conf1 = confusion_matrix(y_df, pred1)
+    mat1 =  pd.DataFrame ((confusion_matrix(y_df, pred1 )),index = ['actual_dead','actual_survived'], columns =['pred_dead','pred_survived' ])
+    rubric_df = pd.DataFrame([['True Negative', 'False positive'], ['False Negative', 'True Positive']], columns=mat1.columns, index=mat1.index)
+    cf1 = rubric_df + ': ' + mat1.values.astype(str)
+    
+    #model2
+    conf2 = confusion_matrix(y_df, pred2)
+    mat2 =  pd.DataFrame ((confusion_matrix(y_df, pred2 )),index = ['actual_dead','actual_survived'], columns =['pred_dead','pred_survived' ])
+    cf2 = rubric_df + ': ' + mat2.values.astype(str)
+    #model 1
+    #assign the values
+    tp = conf1[1,1]
+    fp =conf1[0,1] 
+    fn= conf1[1,0]
+    tn =conf1[0,0]
+
+    #calculate the rate
+    tpr1 = tp/(tp+fn)
+    fpr1 = fp/(fp+tn)
+    tnr1 = tn/(tn+fp)
+    fnr1 = fn/(fn+tp)
+
+    #model 2
+    #assign the values
+    tp = conf2[1,1]
+    fp =conf2[0,1] 
+    fn= conf2[1,0]
+    tn =conf2[0,0]
+
+    #calculate the rate
+    tpr2 = tp/(tp+fn)
+    fpr2 = fp/(fp+tn)
+    tnr2 = tn/(tn+fp)
+    fnr2 = fn/(fn+tp)
+
+    #classification report
+    #model1
+    clas_rep1 =pd.DataFrame(classification_report(y_df, pred1, output_dict=True)).T
+    clas_rep1.rename(index={'0': "dead", '1': "survived"}, inplace = True)
+
+    #model2
+    clas_rep2 =pd.DataFrame(classification_report(y_df, pred2, output_dict=True)).T
+    clas_rep2.rename(index={'0': "dead", '1': "survived"}, inplace = True)
+    print(f'''
+    ******       Model 1  ******                                ******     Model 2  ****** 
+    The accuracy for our model 1 is {acc1:.4%}              |   The accuracy for our model 2 is {acc2:.4%}  
+                                                         |
+    The True Positive Rate is {tpr1:.3%}                     |   The True Positive Rate is {tpr2:.3%}  
+    The False Positive Rate is {fpr1:.3%}                    |   The False Positive Rate is {fpr2:.3%} 
+    The True Negative Rate is {tnr1:.3%}                     |   The True Negative Rate is {tnr2:.3%} 
+    The False Negative Rate is {fnr1:.3%}                    |   The False Negative Rate is {fnr2:.3%}
+
+    _____________________________________________________________________________________________________________
+    ''')
+    print('''
+    The positive is  'survived'
+
+    Confusion Matrix
+    ''')
+    display(cf1), display(cf2)
+    print('''
+
+    ________________________________________________________________________________
+    
+    Classification Report:
+    ''')
+    display(clas_rep1), display(clas_rep2)
+   
