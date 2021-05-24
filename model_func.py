@@ -198,8 +198,8 @@ def compare (model1, model2, X_df,y_df):
 
     Confusion Matrix
     ''')
-    cf1_styler = cf1.style.set_table_attributes("style='display:inline'").set_caption('Confusion Matrix')
-    cf2_styler = cf2.style.set_table_attributes("style='display:inline'").set_caption('Confusion Matrix')
+    cf1_styler = cf1.style.set_table_attributes("style='display:inline'").set_caption('Model 1')
+    cf2_styler = cf2.style.set_table_attributes("style='display:inline'").set_caption('Model2')
     space = "\xa0" * 10
     display_html(cf1_styler._repr_html_()+ space  + cf2_styler._repr_html_(), raw=True)
     # print(display(cf1),"           ", display(cf2))
@@ -210,14 +210,106 @@ def compare (model1, model2, X_df,y_df):
     
     Classification Report:
     ''')
-    display(clas_rep1), display(clas_rep2)
+     
+    clas_rep1_styler = clas_rep1.style.set_table_attributes("style='display:inline'").set_caption('Model 1 Classification Report')
+    clas_rep2_styler = clas_rep2.style.set_table_attributes("style='display:inline'").set_caption('Model 2 Classification Report')
+    space = "\xa0" * 10
+    display_html(clas_rep1_styler._repr_html_()+ space  + clas_rep2_styler._repr_html_(), raw=True)
    
 
-# print(f'''
-# positive: {positive}
+########################################################
+def compare_train_validate (model, X_train, y_train, X_validate, y_validate):
+    '''
+    Take in a X_train, y_train, X_validate, y_validate and model  and fit the model , make a prediction, calculate score (accuracy), 
+    confusion matrix, rates, clasification report.
+    X_df: train, validate or  test. Select one
+    y_df: it has to be the same as X_df.
+    model: name of your model that you prevously created 
+    
+    Example:
+    
+    '''
+    
+    
 
-#          | accuracy | recall | precision
-#          | -------- | ------ | ---------         
-#    model | {model_accuracy:8.1%} | {model_recall:6.1%} | {model_precision:9.1%}
-# baseline | {baseline_accuracy:8.1%} | {baseline_recall:6.1%} | {baseline_precision:9.1%}
-# '''
+    #prediction
+    pred_train = model.predict(X_train)
+    pred_validate = model.predict(X_validate)
+
+    #score = accuracy
+    acc_train = model.score(X_train, y_train)
+    acc_validate = model.score(X_validate, y_validate)
+
+
+    #conf Matrix
+    #model 1
+    conf_train = confusion_matrix(y_train, pred_train)
+    mat_train =  pd.DataFrame ((confusion_matrix(y_train, pred_train )),index = ['actual_dead','actual_survived'], columns =['pred_dead','pred_survived' ])
+    rubric_df = pd.DataFrame([['TN', 'FP'], ['FN', 'TP']], columns=mat_train.columns, index=mat_train.index)
+    cf_train = rubric_df + ' : ' + mat_train.values.astype(str)
+    
+    #model2
+    conf_validate = confusion_matrix(y_validate, pred_validate)
+    mat_validate =  pd.DataFrame ((confusion_matrix(y_validate, pred_validate )),index = ['actual_dead','actual_survived'], columns =['pred_dead','pred_survived' ])
+    cf_validate = rubric_df + ' : ' + mat_validate.values.astype(str)
+    #model 1
+    #assign the values
+    tp = conf_train[1,1]
+    fp = conf_train[0,1] 
+    fn = conf_train[1,0]
+    tn = conf_train[0,0]
+
+    #calculate the rate
+    tpr_train = tp/(tp+fn)
+    fpr_train = fp/(fp+tn)
+    tnr_train = tn/(tn+fp)
+    fnr_train = fn/(fn+tp)
+
+    #model 2
+    #assign the values
+    tp = conf_validate[1,1]
+    fp = conf_validate[0,1] 
+    fn = conf_validate[1,0]
+    tn = conf_validate[0,0]
+
+    #calculate the rate
+    tpr_validate = tp/(tp+fn)
+    fpr_validate = fp/(fp+tn)
+    tnr_validate = tn/(tn+fp)
+    fnr_validate = fn/(fn+tp)
+
+    #classification report
+    #model1
+    clas_rep_train =pd.DataFrame(classification_report(y_train, pred_train, output_dict=True)).T
+    clas_rep_train.rename(index={'0': "dead", '1': "survived"}, inplace = True)
+
+    #model2
+    clas_rep_validate =pd.DataFrame(classification_report(y_validate, pred_validate, output_dict=True)).T
+    clas_rep_validate.rename(index={'0': "dead", '1': "survived"}, inplace = True)
+    print(f'''
+    ******       Train    ******                                ******     Validate    ****** 
+       Overall Accuracy:  {acc_train:.2%}              |                Overall Accuracy:  {acc_validate:.2%}  
+                                                
+     True Positive Rate:  {tpr_train:.2%}              |          The True Positive Rate:  {tpr_validate:.2%}  
+    False Positive Rate:  {fpr_train:.2%}              |         The False Positive Rate:  {fpr_validate:.2%} 
+     True Negative Rate:  {tnr_train:.2%}              |          The True Negative Rate:  {tnr_validate:.2%} 
+    False Negative Rate:  {fnr_train:.2%}              |         The False Negative Rate:  {fnr_validate:.2%}
+    _________________________________________________________________________________
+    ''')
+    print('''
+    Positive =  'survived'
+    Confusion Matrix
+    ''')
+    cf_train_styler = cf_train.style.set_table_attributes("style='display:inline'").set_caption('Train Confusion Matrix')
+    cf_validate_styler = cf_validate.style.set_table_attributes("style='display:inline'").set_caption('Validate Confusion Matrix')
+    space = "\xa0" * 10
+    display_html(cf_train_styler._repr_html_()+ space  + cf_validate_styler._repr_html_(), raw=True)
+    print('''
+    ________________________________________________________________________________
+    
+    Classification Report:
+    ''')
+    clas_rep_train_styler = clas_rep_train.style.set_table_attributes("style='display:inline'").set_caption('Train Classification Report')
+    clas_rep_validate_styler = clas_rep_validate.style.set_table_attributes("style='display:inline'").set_caption('Validate Classification Report')
+    space = "\xa0" * 10
+    display_html(clas_rep_train_styler._repr_html_()+ space  + clas_rep_validate_styler._repr_html_(), raw=True)
