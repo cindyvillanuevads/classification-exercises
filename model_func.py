@@ -10,8 +10,7 @@ from sklearn.metrics import recall_score
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import classification_report
 import matplotlib.pyplot as plt
-from IPython.display import display
-
+from IPython.display import display, display_html 
 
 
 # split our X and y
@@ -127,6 +126,8 @@ def compare (model1, model2, X_df,y_df):
     mmodel_performs (X_train, y_train, model1)
     '''
 
+
+
     #prediction
     pred1 = model1.predict(X_df)
     pred2 = model2.predict(X_df)
@@ -183,12 +184,12 @@ def compare (model1, model2, X_df,y_df):
     clas_rep2.rename(index={'0': "dead", '1': "survived"}, inplace = True)
     print(f'''
     ******       Model 1  ******                                ******     Model 2  ****** 
-    The accuracy for our model 1 is {acc1:.4%}              |   The accuracy for our model 2 is {acc2:.4%}  
-                                                         |
-    The True Positive Rate is {tpr1:.3%}                     |   The True Positive Rate is {tpr2:.3%}  
-    The False Positive Rate is {fpr1:.3%}                    |   The False Positive Rate is {fpr2:.3%} 
-    The True Negative Rate is {tnr1:.3%}                     |   The True Negative Rate is {tnr2:.3%} 
-    The False Negative Rate is {fnr1:.3%}                    |   The False Negative Rate is {fnr2:.3%}
+    The accuracy for our model 1 is {acc1:.4%}            |   The accuracy for our model 2 is {acc2:.4%}  
+                                                        |
+    The True Positive Rate is {tpr1:.3%}                   |   The True Positive Rate is {tpr2:.3%}  
+    The False Positive Rate is {fpr1:.3%}                   |  The False Positive Rate is {fpr2:.3%} 
+    The True Negative Rate is {tnr1:.3%}                   |   The True Negative Rate is {tnr2:.3%} 
+    The False Negative Rate is {fnr1:.3%}                   |  The False Negative Rate is {fnr2:.3%}
 
     _____________________________________________________________________________________________________________
     ''')
@@ -197,7 +198,12 @@ def compare (model1, model2, X_df,y_df):
 
     Confusion Matrix
     ''')
-    display(cf1), display(cf2)
+    cf1_styler = cf1.style.set_table_attributes("style='display:inline'").set_caption('Confusion Matrix')
+    cf2_styler = cf2.style.set_table_attributes("style='display:inline'").set_caption('Confusion Matrix')
+    space = "\xa0" * 10
+    display_html(cf1_styler._repr_html_()+ space  + cf2_styler._repr_html_(), raw=True)
+    # print(display(cf1),"           ", display(cf2))
+    
     print('''
 
     ________________________________________________________________________________
@@ -206,3 +212,12 @@ def compare (model1, model2, X_df,y_df):
     ''')
     display(clas_rep1), display(clas_rep2)
    
+
+# print(f'''
+# positive: {positive}
+
+#          | accuracy | recall | precision
+#          | -------- | ------ | ---------         
+#    model | {model_accuracy:8.1%} | {model_recall:6.1%} | {model_precision:9.1%}
+# baseline | {baseline_accuracy:8.1%} | {baseline_recall:6.1%} | {baseline_precision:9.1%}
+# '''
