@@ -187,9 +187,9 @@ def compare (model1, model2, X_df,y_df):
     The accuracy for our model 1 is {acc1:.4%}            |   The accuracy for our model 2 is {acc2:.4%}  
                                                         |
     The True Positive Rate is {tpr1:.3%}                   |   The True Positive Rate is {tpr2:.3%}  
-    The False Positive Rate is {fpr1:.3%}                   |  The False Positive Rate is {fpr2:.3%} 
+    The False Positive Rate is {fpr1:.3%}                  |   The False Positive Rate is {fpr2:.3%} 
     The True Negative Rate is {tnr1:.3%}                   |   The True Negative Rate is {tnr2:.3%} 
-    The False Negative Rate is {fnr1:.3%}                   |  The False Negative Rate is {fnr2:.3%}
+    The False Negative Rate is {fnr1:.3%}                  |   The False Negative Rate is {fnr2:.3%}
 
     _____________________________________________________________________________________________________________
     ''')
@@ -200,7 +200,7 @@ def compare (model1, model2, X_df,y_df):
     ''')
     cf1_styler = cf1.style.set_table_attributes("style='display:inline'").set_caption('Model 1')
     cf2_styler = cf2.style.set_table_attributes("style='display:inline'").set_caption('Model2')
-    space = "\xa0" * 10
+    space = "\xa0" * 50
     display_html(cf1_styler._repr_html_()+ space  + cf2_styler._repr_html_(), raw=True)
     # print(display(cf1),"           ", display(cf2))
     
@@ -213,103 +213,108 @@ def compare (model1, model2, X_df,y_df):
      
     clas_rep1_styler = clas_rep1.style.set_table_attributes("style='display:inline'").set_caption('Model 1 Classification Report')
     clas_rep2_styler = clas_rep2.style.set_table_attributes("style='display:inline'").set_caption('Model 2 Classification Report')
-    space = "\xa0" * 10
+    space = "\xa0" * 45
     display_html(clas_rep1_styler._repr_html_()+ space  + clas_rep2_styler._repr_html_(), raw=True)
    
 
 ########################################################
-def compare_train_validate (model, X_train, y_train, X_validate, y_validate):
+def compare_metrics (model, name_dataset1, X, y, name_dataset2,  X2, y2 ):
     '''
-    Take in a X_train, y_train, X_validate, y_validate and model  and fit the model , make a prediction, calculate score (accuracy), 
-    confusion matrix, rates, clasification report.
-    X_df: train, validate or  test. Select one
-    y_df: it has to be the same as X_df.
-    model: name of your model that you prevously created 
+    Take in a  model and compare the  performance metrics of  Train, Evaluate and Test (only 2).
+    model: the model that you want to compare
+    name_dataset1 : type :train, validate or  test. Select one, STRING
+    X: df test, validate or test
+    y: df test, validate or test
+    name_dataset2: type :train, validate or  test. Select one, STRING
+    X2: df2 test, validate or test
+    y2: df2 test, validate or test
     
     Example:
-    
+    compare_metrics(logit2,'Train',X_train, y_train,'Test', X_test, y_test)
     '''
     
-    
-
+    if name_dataset1.lower() != "train" and name_dataset1.lower() != "validate" and name_dataset1.lower() != "test" :
+        return print("incorrect name")
+    if name_dataset2.lower() != "train" and name_dataset2.lower() != "validate" and name_dataset2.lower() != "test" :
+        return print("incorrect name")
     #prediction
-    pred_train = model.predict(X_train)
-    pred_validate = model.predict(X_validate)
+    pred_1 = model.predict(X)
+    pred_2 = model.predict(X2)
 
     #score = accuracy
-    acc_train = model.score(X_train, y_train)
-    acc_validate = model.score(X_validate, y_validate)
+    acc_1 = model.score(X, y)
+    acc_2 = model.score(X2, y2)
 
 
     #conf Matrix
     #model 1
-    conf_train = confusion_matrix(y_train, pred_train)
-    mat_train =  pd.DataFrame ((confusion_matrix(y_train, pred_train )),index = ['actual_dead','actual_survived'], columns =['pred_dead','pred_survived' ])
-    rubric_df = pd.DataFrame([['TN', 'FP'], ['FN', 'TP']], columns=mat_train.columns, index=mat_train.index)
-    cf_train = rubric_df + ' : ' + mat_train.values.astype(str)
+    conf_1 = confusion_matrix(y, pred_1)
+    mat_1 =  pd.DataFrame ((confusion_matrix(y, pred_1 )),index = ['actual_dead','actual_survived'], columns =['pred_dead','pred_survived' ])
+    rubric_df = pd.DataFrame([['TN', 'FP'], ['FN', 'TP']], columns=mat_1.columns, index=mat_1.index)
+    cf_1 = rubric_df + ' : ' + mat_1.values.astype(str)
     
     #model2
-    conf_validate = confusion_matrix(y_validate, pred_validate)
-    mat_validate =  pd.DataFrame ((confusion_matrix(y_validate, pred_validate )),index = ['actual_dead','actual_survived'], columns =['pred_dead','pred_survived' ])
-    cf_validate = rubric_df + ' : ' + mat_validate.values.astype(str)
+    conf_2 = confusion_matrix(y2, pred_2)
+    mat_2 =  pd.DataFrame ((confusion_matrix(y2, pred_2 )),index = ['actual_dead','actual_survived'], columns =['pred_dead','pred_survived' ])
+    cf_2 = rubric_df + ' : ' + mat_2.values.astype(str)
     #model 1
     #assign the values
-    tp = conf_train[1,1]
-    fp = conf_train[0,1] 
-    fn = conf_train[1,0]
-    tn = conf_train[0,0]
+    tp = conf_1[1,1]
+    fp = conf_1[0,1] 
+    fn = conf_1[1,0]
+    tn = conf_1[0,0]
 
     #calculate the rate
-    tpr_train = tp/(tp+fn)
-    fpr_train = fp/(fp+tn)
-    tnr_train = tn/(tn+fp)
-    fnr_train = fn/(fn+tp)
+    tpr_1 = tp/(tp+fn)
+    fpr_1 = fp/(fp+tn)
+    tnr_1 = tn/(tn+fp)
+    fnr_1 = fn/(fn+tp)
 
     #model 2
     #assign the values
-    tp = conf_validate[1,1]
-    fp = conf_validate[0,1] 
-    fn = conf_validate[1,0]
-    tn = conf_validate[0,0]
+    tp = conf_2[1,1]
+    fp = conf_2[0,1] 
+    fn = conf_2[1,0]
+    tn = conf_2[0,0]
 
     #calculate the rate
-    tpr_validate = tp/(tp+fn)
-    fpr_validate = fp/(fp+tn)
-    tnr_validate = tn/(tn+fp)
-    fnr_validate = fn/(fn+tp)
+    tpr_2 = tp/(tp+fn)
+    fpr_2 = fp/(fp+tn)
+    tnr_2 = tn/(tn+fp)
+    fnr_2 = fn/(fn+tp)
 
     #classification report
     #model1
-    clas_rep_train =pd.DataFrame(classification_report(y_train, pred_train, output_dict=True)).T
-    clas_rep_train.rename(index={'0': "dead", '1': "survived"}, inplace = True)
+    clas_rep_1 =pd.DataFrame(classification_report(y, pred_1, output_dict=True)).T
+    clas_rep_1.rename(index={'0': "dead", '1': "survived"}, inplace = True)
 
     #model2
-    clas_rep_validate =pd.DataFrame(classification_report(y_validate, pred_validate, output_dict=True)).T
-    clas_rep_validate.rename(index={'0': "dead", '1': "survived"}, inplace = True)
+    clas_rep_2 =pd.DataFrame(classification_report(y2, pred_2, output_dict=True)).T
+    clas_rep_2.rename(index={'0': "dead", '1': "survived"}, inplace = True)
     print(f'''
-    ******       Train    ******                                ******     Validate    ****** 
-       Overall Accuracy:  {acc_train:.2%}              |                Overall Accuracy:  {acc_validate:.2%}  
+    ******    {name_dataset1}       ******                              ******     {name_dataset2}    ****** 
+       Overall Accuracy:  {acc_1:.2%}              |                Overall Accuracy:  {acc_2:.2%}  
                                                 
-     True Positive Rate:  {tpr_train:.2%}              |          The True Positive Rate:  {tpr_validate:.2%}  
-    False Positive Rate:  {fpr_train:.2%}              |         The False Positive Rate:  {fpr_validate:.2%} 
-     True Negative Rate:  {tnr_train:.2%}              |          The True Negative Rate:  {tnr_validate:.2%} 
-    False Negative Rate:  {fnr_train:.2%}              |         The False Negative Rate:  {fnr_validate:.2%}
+    True Positive Rate:  {tpr_1:.2%}               |          The True Positive Rate:  {tpr_2:.2%}  
+    False Positive Rate:  {fpr_1:.2%}              |          The False Positive Rate:  {fpr_2:.2%} 
+    True Negative Rate:  {tnr_1:.2%}               |          The True Negative Rate:  {tnr_2:.2%} 
+    False Negative Rate:  {fnr_1:.2%}              |          The False Negative Rate:  {fnr_2:.2%}
     _________________________________________________________________________________
     ''')
     print('''
     Positive =  'survived'
     Confusion Matrix
     ''')
-    cf_train_styler = cf_train.style.set_table_attributes("style='display:inline'").set_caption('Train Confusion Matrix')
-    cf_validate_styler = cf_validate.style.set_table_attributes("style='display:inline'").set_caption('Validate Confusion Matrix')
-    space = "\xa0" * 10
-    display_html(cf_train_styler._repr_html_()+ space  + cf_validate_styler._repr_html_(), raw=True)
+    cf_1_styler = cf_1.style.set_table_attributes("style='display:inline'").set_caption(f'{name_dataset1} Confusion Matrix')
+    cf_2_styler = cf_2.style.set_table_attributes("style='display:inline'").set_caption(f'{name_dataset2} Confusion Matrix')
+    space = "\xa0" * 50
+    display_html(cf_1_styler._repr_html_()+ space  + cf_2_styler._repr_html_(), raw=True)
     print('''
     ________________________________________________________________________________
     
     Classification Report:
     ''')
-    clas_rep_train_styler = clas_rep_train.style.set_table_attributes("style='display:inline'").set_caption('Train Classification Report')
-    clas_rep_validate_styler = clas_rep_validate.style.set_table_attributes("style='display:inline'").set_caption('Validate Classification Report')
-    space = "\xa0" * 10
-    display_html(clas_rep_train_styler._repr_html_()+ space  + clas_rep_validate_styler._repr_html_(), raw=True)
+    clas_rep_1_styler = clas_rep_1.style.set_table_attributes("style='display:inline'").set_caption(f'{name_dataset1} Classification Report')
+    clas_rep_2_styler = clas_rep_2.style.set_table_attributes("style='display:inline'").set_caption(f'{name_dataset2} Classification Report')
+    space = "\xa0" * 45
+    display_html(clas_rep_1_styler._repr_html_()+ space  + clas_rep_2_styler._repr_html_(), raw=True)
