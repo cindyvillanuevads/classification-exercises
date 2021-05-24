@@ -8,3 +8,5 @@ Thumbs.db
 *.json
 *.xlsx
 *.zip
+knn_lesson_util.py
+logistic_regression_util.py
