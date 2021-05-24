@@ -53,6 +53,29 @@ def iris_split_data(df):
 
 
 # ************************************ TITANIC DATA***********************************
+
+def clean_data(df, dummies):
+    '''
+    This function will drop any duplicate observations, 
+    drop ['deck', 'embark_town', 'class'], fill missing embarked with 'Southampton'
+    and create dummy vars from sex and embarked. 
+    '''
+
+    #clean data
+    df = df.drop_duplicates()
+    df = df.drop(columns=['deck', 'embark_town', 'class'])
+    df['embarked'] = df.embarked.fillna(value='S')
+    #create a dummy df
+    dummy_df = pd.get_dummies(df[dummies], drop_first=[True, True])
+    ## Concatenate the dummy_df dataframe above with the original df
+    df = pd.concat([df, dummy_df], axis=1)
+    # drop the columns that we already use to create dummy_df
+    df = df.drop(columns= dummies)
+    
+    return df
+
+
+
 def split_data(df):
     '''
     take in a DataFrame and return train, validate, and test DataFrames; stratify on survived.
@@ -85,22 +108,14 @@ def prep_titanic_data(df, column, method ,dummies):
     - df: a pandas DataFrame with the expected feature names and columns
     - column : the name of the column to fill or impute the missing values in
     - method: type of strategy (median, mean, most_frequent) for SimpleImputer
-    - dummies: list of columns to create a dummy variable 
+    - dummies: list of 2 columns to create a dummy variable 
     return: 
     train, validate, test (three dataframes with the cleaning operations performed on them)
+    Example :
+    train, validate, test = prepare.prep_titanic_data(df, column = 'age', method = 'median', dummies = ['embarked', 'sex'])
     '''
     #clean data
-    df = df.drop_duplicates()
-    df = df.drop(columns=['deck', 'embark_town'])
-    
-    #create a dummy df
-    dummy_df = pd.get_dummies(df[dummies], drop_first=[True, True])
-    ## Concatenate the dummy_df dataframe above with the original df
-    df = pd.concat([df, dummy_df], axis=1)
-    
-    # drop the deck column
-    df = df.drop(columns= dummies)
-    #split data
+    df = clean_data(df, dummies)
     
     # split data into train, validate, test dfs
     train, validate, test = split_data(df)
